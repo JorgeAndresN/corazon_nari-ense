@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Google Maps – Municipios Turísticos de Nariño</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <!-- Pantalla de carga -->
+  <div id="loader">
+    <div id="loader-logo">
+  <img src="imagenes/Logo.png" alt="Logo Nariño" />
+</div>
+    <div id="loader-logo">Corazon nariñense</div>
+    <div class="dots-container">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div id="contenedor">
+    <div id="logoCircle">
+      <img src="imagenes/Logo.png"  alt="Logo Nariño">
+    </div>
+
+    <div id="panel">
+      <input id="origen" placeholder="Origen (tu ubicación)" />
+      <div id="error-origen" class="error-message"></div>
+      
+      <input id="destino" placeholder="Destino (solo Nariño)" />
+      <div id="error-destino" class="error-message"></div>
+      
+      <select id="modo">
+        <option value="DRIVING">Auto</option>
+        <option value="WALKING">Caminar</option>
+        <option value="BICYCLING">Bicicleta</option>
+      </select>
+      
+      <button id="btnUbicar" class="btn-ubicar">
+        📍 Mi Ubicación
+      </button>
+      
+      <button id="btnVoz" class="btn-voz">
+        <span id="iconoVoz">🎤</span> Hablar
+      </button>
+      <div id="estadoVoz" class="estado-voz"></div>
+      
+      <div style="display:flex;gap:4px; margin-top: 8px;">
+        <button id="btnBuscar" style="flex:1">Buscar</button>
+        <button id="btnBorrar" style="flex:1">Borrar</button>
+      </div>
+      <button id="btnRecomendaciones" style="margin-top: 8px; width: 100%; background: #ff9800; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer;">
+  💡 Recomendaciones
+</button>
+      <div id="resultado" style="margin-top:6px;font-size:13px"></div>
+    </div>
+
+    <!-- Botón de notificaciones -->
+<button id="btnNotificaciones" class="btn-notificaciones" title="Notificaciones">
+  🔔
+</button>
+
+<!-- Ventana emergente de notificaciones -->
+<div id="popupNotificaciones" class="popup-notificaciones oculto">
+  <div class="popup-content">
+    <button class="cerrar-popup" onclick="cerrarNotificaciones()">×</button>
+    <h2>Ahora en Nariño</h2>
+
+    <div class="notificacion-grid">
+      <!-- Noticia 1 -->
+      <div class="noticia-item">
+        <div class="info">
+          <p class="fecha">7 de noviembre 2025</p>
+          <p class="lugar">Tuquerres</p>
+          <h3>Festival del Cuy</h3>
+          <p class="desc">Celebra con lo mejor de la gastronomía nariñense. Música, tradición y sabor.</p>
+        </div>
+        <img src="/turismo_nari-o/imagenes/cuy.jpg" alt="Cuy">
+      </div>
+
+      <!-- Noticia 2 -->
+      <div class="noticia-item">
+        <div class="info">
+          <p class="fecha">8 de noviembre 2025</p>
+          <p class="lugar">Pasto</p>
+          <h3>Feria Artesanal</h3>
+          <p class="desc">Exhibición y venta de artesanías locales. Ideal para souvenirs únicos.</p>
+        </div>
+        <img src="/turismo_nari-o/imagenes/artesanal.jpg" alt="Artesanía">
+      </div>
+
+      <!-- Noticia 3 -->
+      <div class="noticia-item">
+        <div class="info">
+          <p class="fecha">9 de noviembre 2025</p>
+          <p class="lugar">Tumaco</p>
+          <h3>Festival del Cacao</h3>
+          <p class="desc">Degusta chocolate artesanal y conoce el proceso del cacao pacífico.</p>
+        </div>
+        <img src="/turismo_nari-o/imagenes/CACAo.jpg" alt="Cacao">
+      </div>
+    </div>
+  </div>
+</div>
+    
+    <div id="map"></div>
+    <div id="pasoActual"></div>
+    
+    <!-- PANEL FLOTANTE AL 70% CON GRID -->
+    <div id="panelMunicipio" class="panel-lateral">
+      <button class="cerrar-panel" onclick="cerrarPanelMunicipio()">×</button>
+      <h2 id="municipioNombre" style="grid-column: 1 / -1;"></h2>
+      
+      <!-- COLUMNA IZQUIERDA: FOTOS -->
+      <div class="panel-columna-fotos">
+        <img id="municipioFoto1" src="" alt="Foto 1">
+        <img id="municipioFoto2" src="" alt="Foto 2">
+        <img id="municipioFoto3" src="" alt="Foto 3">
+        <img id="municipioFoto4" src="" alt="Foto 4">
+        <img id="municipioFoto5" src="" alt="Foto 5">
+        <img id="municipioFoto6" src="" alt="Foto 6">
+        <img id="municipioFoto7" src="" alt="Foto 7">
+      </div>
+      
+      <!-- COLUMNA DERECHA: CONTENIDO -->
+      <div class="panel-columna-contenido">
+        <!-- CURIOSIDAD ARRIBA -->
+        <div class="municipio-curiosidad">
+          <h3>¿Sabías qué?</h3>
+          <p id="municipioCuriosidad"></p>
+        </div>
+        
+        <!-- SECCIÓN ¿DÓNDE COMER? -->
+        <div class="seccion-vertical">
+          <h3>🍽️ ¿Dónde comer?</h3>
+          <div id="comerLugares" class="lugares-container"></div>
+        </div>
+        
+        <!-- SECCIÓN ¿DÓNDE HOSPEDARSE? -->
+        <div class="seccion-vertical">
+          <h3>🏨 ¿Dónde hospedarse?</h3>
+          <div id="hospedarseLugares" class="lugares-container"></div>
+        </div>
+        
+        <!-- SECCIÓN ¿QUÉ HACER? -->
+        <div class="seccion-vertical">
+          <h3>🎯 ¿Qué hacer?</h3>
+          <div id="hacerLugares" class="lugares-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENTANA EMERGENTE DE RECOMENDACIONES -->
+<div id="popupRecomendaciones" class="popup-recomendaciones oculto">
+  <div class="popup-content-recomendaciones">
+    <button class="cerrar-popup" onclick="cerrarRecomendaciones()">×</button>
+    <h2>¿Qué podrías hacer hoy?</h2>
+
+    <div class="recomendaciones-lista">
+      <div class="recomendacion-item">
+        <h3>🍽️ Probar comida típica</h3>
+        <p>Visitá un restaurante local y disfrutá de cuy, tamales o envueltos.</p>
+        <small>📍 Recomendado: La Fonda del Gallo (Buesaco)</small>
+      </div>
+
+      <div class="recomendacion-item">
+        <h3>🏞️ Visitar un mirador natural</h3>
+        <p>Subí a un punto alto para ver el paisaje andino.</p>
+        <small>📍 Recomendado: Mirador Paso Ancho (Buesaco)</small>
+      </div>
+
+      <div class="recomendacion-item">
+        <h3>🏊 Relajarte en un estadero con piscina</h3>
+        <p>Disfrutá del clima templado y refrescate en un estadero.</p>
+        <small>📍 Recomendado: Buesaquito (7 min desde el centro)</small>
+      </div>
+
+      <div class="recomendacion-item">
+        <h3>🙏 Visitar un santuario religioso</h3>
+        <p>Conocé la Virgen de Lourdes, un lugar de paz y fe.</p>
+        <small>📍 Recomendado: Santuario de la Virgen de Lourdes (Buesaco)</small>
+      </div>
+
+      <div class="recomendacion-item">
+        <h3>🛍️ Comprar artesanías locales</h3>
+        <p>Llevate un recuerdo hecho a mano por artesanos nariñenses.</p>
+        <small>📍 Recomendado: Feria artesanal de Pasto (si estás cerca)</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAAw2oW9-PCgPMif7m_j4KX93eyIGz92xc&libraries=places,geometry&callback=initMap" async defer></script>
+</body>
+</html>
